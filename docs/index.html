@@ -3,39 +3,99 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SQL Quiz: Designer Shoes</title>
+<title>The Runway Exam | SQL Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,700&display=swap" rel="stylesheet">
 <style>
-body{font-family:system-ui,sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem;line-height:1.5}
-textarea{width:100%;height:9rem;font-family:ui-monospace,monospace}
-table{border-collapse:collapse;margin:.5rem 0}td,th{border:1px solid #888;padding:.25rem .5rem;text-align:left}
-.q{display:block;width:100%;text-align:left;margin:.25rem 0;padding:.5rem}
-.err{color:#b00020}.hidden{display:none}pre{white-space:pre-wrap;background:#8881;padding:.5rem}
+:root{--ink:#0b0709;--card:#170e13cc;--rose:#ff5fa2;--blush:#ffd3e4;--gold:#e7c36a;--gold2:#f6e6b0;--line:#e7c36a55}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:#f7e9ee;font-family:'Montserrat',system-ui,sans-serif;font-weight:300;line-height:1.6;
+  background:radial-gradient(900px 520px at 50% -8%,#ff5fa238,transparent 62%),radial-gradient(520px 380px at 95% 35%,#e7c36a22,transparent 60%),radial-gradient(520px 380px at 0% 70%,#ff5fa21c,transparent 60%),var(--ink)}
+.wrap{max-width:920px;margin:0 auto;padding:2.5rem 1.2rem 4rem}
+header{text-align:center;margin-bottom:2rem}
+.eyebrow{letter-spacing:.4em;text-transform:uppercase;font-size:.72rem;color:var(--gold);font-weight:600}
+h1{font-family:'Playfair Display',serif;font-style:italic;font-weight:700;font-size:clamp(2.6rem,9vw,4.8rem);line-height:1.05;margin:.4rem 0;
+  background:linear-gradient(100deg,var(--gold2),var(--rose) 45%,var(--gold) 75%,var(--gold2));background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 7s linear infinite}
+.sub{color:var(--blush);letter-spacing:.12em;text-transform:uppercase;font-size:.8rem}
+.stars{color:var(--gold);letter-spacing:.9em;margin:1rem 0 0;font-size:.9rem}
+.stars span{display:inline-block;animation:twinkle 2.4s ease-in-out infinite}
+.stars span:nth-child(2){animation-delay:.4s}.stars span:nth-child(3){animation-delay:.8s}
+.stars span:nth-child(4){animation-delay:1.2s}.stars span:nth-child(5){animation-delay:1.6s}
+@keyframes twinkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.25)}}
+@keyframes shine{to{background-position:200% center}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.4rem;backdrop-filter:blur(8px);box-shadow:0 10px 40px #0008,inset 0 0 40px #ff5fa210}
+.pass{font-size:.85rem;color:var(--blush);margin:0 0 1rem}
+.pass code{color:var(--gold2);font-family:ui-monospace,monospace}
+input{background:#0b0709aa;border:1px solid var(--line);color:#fff;padding:.75rem 1rem;border-radius:999px;font:inherit;min-width:220px;margin:0 .4rem .6rem 0}
+input:focus,textarea:focus{outline:none;border-color:var(--rose);box-shadow:0 0 0 3px #ff5fa244}
+button{font:inherit;cursor:pointer}
+.btn{border:0;border-radius:999px;padding:.7rem 1.5rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:.74rem;color:#2a1a00;
+  background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 4px 18px #e7c36a44;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 26px #e7c36a66}
+.btn.rose{color:#fff;background:linear-gradient(135deg,#ff8fc0,var(--rose));box-shadow:0 4px 18px #ff5fa244}
+.btn.ghost{background:transparent;color:var(--gold2);border:1px solid var(--line);box-shadow:none}
+.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem}
+.top b{color:var(--gold2);font-weight:600}
+#list{display:grid;gap:.7rem;margin-bottom:1.2rem}
+.q{display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:center;text-align:left;width:100%;color:#f7e9ee;background:#170e13cc;border:1px solid var(--line);border-radius:14px;padding:.9rem 1.1rem;transition:.2s}
+.q:hover{border-color:var(--rose);transform:translateX(4px)}
+.q.active{border-color:var(--rose);background:linear-gradient(90deg,#ff5fa222,#170e13cc);box-shadow:0 0 24px #ff5fa233}
+.q .num{font-family:'Playfair Display',serif;font-style:italic;font-size:1.6rem;color:var(--gold);min-width:4.6rem}
+.q .pts{display:block;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rose)}
+h2{font-family:'Playfair Display',serif;font-style:italic;font-weight:600;font-size:1.8rem;margin:.2rem 0;color:var(--gold2)}
+#qp{color:var(--blush);margin-top:0}
+textarea{width:100%;height:9rem;background:#07040699;border:1px solid var(--line);border-radius:14px;color:#ffe9f2;padding:1rem;font-family:ui-monospace,Consolas,monospace;font-size:.9rem;resize:vertical;margin-bottom:.8rem}
+.actions{display:flex;flex-wrap:wrap;gap:.6rem}
+#msg{margin-top:.8rem}.err{color:#ff8aa8}#msg:not(.err){color:var(--gold2)}
+#res,#hint{overflow-x:auto;margin-top:1rem}
+table{border-collapse:collapse;margin:.4rem 0;min-width:60%}
+th{background:linear-gradient(135deg,#ff5fa2,#b8326f);color:#fff;font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.72rem}
+th,td{padding:.5rem .9rem;text-align:left;border-bottom:1px solid #e7c36a33}
+tbody tr:nth-child(even),tr:nth-child(even) td{background:#ffffff08}
+pre{white-space:pre-wrap;background:#07040699;border:1px dashed var(--gold);border-radius:12px;padding:1rem;color:var(--gold2);font-size:.82rem}
+.hidden{display:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<h1>SQL Quiz (20 pts)</h1>
-<p>Tables: <code>collections</code>, <code>garments</code>, <code>sales</code>. Sign in, pick a question, write a SELECT, run it.</p>
+<div class="wrap">
+<header>
+  <div class="eyebrow">SQL Fashion Week &middot; Designer Shoe Collection</div>
+  <h1>The Runway Exam</h1>
+  <div class="sub">5 looks &middot; 20 points &middot; one catwalk of data</div>
+  <div class="stars"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>
+</header>
 
-<section id="auth">
-  <input id="email" type="email" placeholder="email"> <input id="pw" type="password" placeholder="password (6+ chars)">
-  <button id="in">Sign in</button> <button id="up">Sign up</button>
+<section id="auth" class="card">
+  <p class="pass">Backstage pass required. Sign in to walk the runway. Tables: <code>collections</code>, <code>garments</code>, <code>sales</code>.</p>
+  <input id="email" type="email" placeholder="email"><input id="pw" type="password" placeholder="password (6+ characters)"><br>
+  <button class="btn" id="in">Sign in</button> <button class="btn ghost" id="up">Sign up</button>
   <div id="authmsg"></div>
 </section>
 
 <section id="quiz" class="hidden">
-  <p>Signed in as <b id="who"></b> <button id="out">Sign out</button></p>
+  <div class="top card">
+    <span>Welcome backstage, <b id="who"></b></span>
+    <button class="btn ghost" id="out">Sign out</button>
+  </div>
   <div id="list"></div>
-  <div id="qa" class="hidden">
+  <div id="qa" class="card hidden">
     <h2 id="qt"></h2><p id="qp"></p>
-    <textarea id="sql" placeholder="SELECT ..."></textarea><br>
-    <button id="run">Run</button> <button id="save">Save answer</button> <button id="hintbtn">Show hint</button>
+    <textarea id="sql" placeholder="SELECT ... FROM garments ..."></textarea>
+    <div class="actions">
+      <button class="btn rose" id="run">Strike a pose: Run</button>
+      <button class="btn" id="save">Save answer</button>
+      <button class="btn ghost" id="hintbtn">Show hint</button>
+    </div>
     <div id="msg"></div><div id="res"></div><div id="hint"></div>
   </div>
 </section>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
-// Fill these in (Supabase > Project Settings > API). The anon key is public by design.
+// Keep YOUR key here (Supabase > Project Settings > API Keys). The anon/publishable key is public by design.
 const SUPABASE_URL = 'https://wrbbtdlvglcvmovkooio.supabase.co';
 const ANON_KEY = 'sb_publishable_LS-7mD1uLiTQR6WVw17u0g_NHMB7znU';
 
@@ -73,13 +133,21 @@ async function loadQuestions() {
   data.forEach(q => {
     const b = document.createElement('button');
     b.className = 'q';
-    b.textContent = `Q${q.id} (${q.points} pts): ${q.prompt}`;
+    const num = document.createElement('span'); num.className = 'num';
+    num.textContent = 'Look ' + String(q.id).padStart(2, '0');
+    const body = document.createElement('span');
+    const pts = document.createElement('span'); pts.className = 'pts'; pts.textContent = q.points + ' points';
+    body.append(pts, document.createTextNode(q.prompt));
+    b.append(num, body);
     b.onclick = () => {
       current = q;
+      document.querySelectorAll('.q').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
       $('qa').classList.remove('hidden');
-      $('qt').textContent = `Question ${q.id} (${q.points} pts)`;
+      $('qt').textContent = 'Look ' + String(q.id).padStart(2, '0') + ' · ' + q.points + ' pts';
       $('qp').textContent = q.prompt;
       $('sql').value = ''; $('res').replaceChildren(); $('hint').replaceChildren(); $('msg').textContent = '';
+      $('qa').scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
     $('list').appendChild(b);
   });
@@ -107,7 +175,7 @@ $('run').onclick = async () => {
 };
 $('save').onclick = async () => {
   const { error } = await sb.from('quiz_attempts').insert({ question_id: current.id, sql_text: $('sql').value });
-  say($('msg'), error ? error.message : 'Saved.', !!error);
+  say($('msg'), error ? error.message : 'Saved. Gorgeous.', !!error);
 };
 $('hintbtn').onclick = async () => {
   const el = $('hint'); el.replaceChildren();
