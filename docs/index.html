@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SQL Quiz: Designer Shoes</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem;line-height:1.5}
+textarea{width:100%;height:9rem;font-family:ui-monospace,monospace}
+table{border-collapse:collapse;margin:.5rem 0}td,th{border:1px solid #888;padding:.25rem .5rem;text-align:left}
+.q{display:block;width:100%;text-align:left;margin:.25rem 0;padding:.5rem}
+.err{color:#b00020}.hidden{display:none}pre{white-space:pre-wrap;background:#8881;padding:.5rem}
+</style>
+</head>
+<body>
+<h1>SQL Quiz (20 pts)</h1>
+<p>Tables: <code>collections</code>, <code>garments</code>, <code>sales</code>. Sign in, pick a question, write a SELECT, run it.</p>
+
+<section id="auth">
+  <input id="email" type="email" placeholder="email"> <input id="pw" type="password" placeholder="password (6+ chars)">
+  <button id="in">Sign in</button> <button id="up">Sign up</button>
+  <div id="authmsg"></div>
+</section>
+
+<section id="quiz" class="hidden">
+  <p>Signed in as <b id="who"></b> <button id="out">Sign out</button></p>
+  <div id="list"></div>
+  <div id="qa" class="hidden">
+    <h2 id="qt"></h2><p id="qp"></p>
+    <textarea id="sql" placeholder="SELECT ..."></textarea><br>
+    <button id="run">Run</button> <button id="save">Save answer</button> <button id="hintbtn">Show hint</button>
+    <div id="msg"></div><div id="res"></div><div id="hint"></div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+// Fill these in (Supabase > Project Settings > API). The anon key is public by design.
+const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
+const ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
+
+const sb = supabase.createClient(SUPABASE_URL, ANON_KEY);
+const $ = id => document.getElementById(id);
+let current = null;
+
+function say(el, text, err) { el.textContent = text; el.className = err ? 'err' : ''; }
+
+function render(el, rows) {
+  el.replaceChildren();
+  if (!rows.length) { el.textContent = '(0 rows)'; return; }
+  const cols = Object.keys(rows[0]);
+  const t = document.createElement('table');
+  const head = t.insertRow();
+  cols.forEach(c => { const th = document.createElement('th'); th.textContent = c; head.appendChild(th); });
+  rows.forEach(r => {
+    const tr = t.insertRow();
+    cols.forEach(c => { tr.insertCell().textContent = r[c] === null ? 'NULL' : r[c]; });
+  });
+  el.appendChild(t);
+  el.appendChild(document.createTextNode(rows.length + ' row(s)' + (rows.length === 200 ? ' (capped at 200)' : '')));
+}
+
+async function runSql(sql) {
+  const { data, error } = await sb.rpc('run_quiz_sql', { q: sql });
+  if (error) throw error;
+  return data;
+}
+
+async function loadQuestions() {
+  const { data, error } = await sb.from('quiz_questions').select('*').order('id');
+  if (error) { say($('msg'), error.message, true); return; }
+  $('list').replaceChildren();
+  data.forEach(q => {
+    const b = document.createElement('button');
+    b.className = 'q';
+    b.textContent = `Q${q.id} (${q.points} pts): ${q.prompt}`;
+    b.onclick = () => {
+      current = q;
+      $('qa').classList.remove('hidden');
+      $('qt').textContent = `Question ${q.id} (${q.points} pts)`;
+      $('qp').textContent = q.prompt;
+      $('sql').value = ''; $('res').replaceChildren(); $('hint').replaceChildren(); $('msg').textContent = '';
+    };
+    $('list').appendChild(b);
+  });
+}
+
+function showSession(session) {
+  $('auth').classList.toggle('hidden', !!session);
+  $('quiz').classList.toggle('hidden', !session);
+  if (session) { $('who').textContent = session.user.email; loadQuestions(); }
+}
+
+$('in').onclick = async () => {
+  const { error } = await sb.auth.signInWithPassword({ email: $('email').value, password: $('pw').value });
+  if (error) say($('authmsg'), error.message, true);
+};
+$('up').onclick = async () => {
+  const { error } = await sb.auth.signUp({ email: $('email').value, password: $('pw').value });
+  say($('authmsg'), error ? error.message : 'Account created. If email confirmation is on, confirm, then sign in.', !!error);
+};
+$('out').onclick = () => sb.auth.signOut();
+
+$('run').onclick = async () => {
+  try { render($('res'), await runSql($('sql').value)); say($('msg'), ''); }
+  catch (e) { $('res').replaceChildren(); say($('msg'), e.message, true); }
+};
+$('save').onclick = async () => {
+  const { error } = await sb.from('quiz_attempts').insert({ question_id: current.id, sql_text: $('sql').value });
+  say($('msg'), error ? error.message : 'Saved.', !!error);
+};
+$('hintbtn').onclick = async () => {
+  const el = $('hint'); el.replaceChildren();
+  const pre = document.createElement('pre'); pre.textContent = 'Expected SQL:\n' + current.hint_sql;
+  const out = document.createElement('div');
+  el.append(pre, out);
+  try { render(out, await runSql(current.hint_sql)); } catch (e) { say(out, e.message, true); }
+};
+
+sb.auth.onAuthStateChange((_evt, session) => showSession(session));
+sb.auth.getSession().then(({ data }) => showSession(data.session));
+</script>
+</body>
+</html>
