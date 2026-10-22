@@ -6,15 +6,6 @@ A 20-point SQL quiz that students take against a live, hosted PostgreSQL databas
 
 > Messy code is so last season. Clean architecture never goes out of style.
 
-## Organization for Grading
-
-| Required item | Where to find it |
-|---|---|
-| 1. Hosted PostgreSQL database | Supabase project (Session pooler, `sslmode=require`); schema and data in `init.sql` and `quiz_setup.sql` |
-| 2. Authentication | Supabase Auth (email + password) on the quiz site; signed-out users cannot run queries or save answers |
-| 3. GitHub Actions with GitHub Secrets | `.github/workflows/ci.yml`; see the **Actions** tab for the run; credentials come from repository secrets, never from the file |
-| 4. 20-point SQL quiz | 5 questions x 4 points, stored in the `quiz_questions` table (also in `query.py`); each has a hint with the expected SQL and expected result |
-
 ## How to Take the Quiz
 
 1. Open the quiz site and **Sign up** with an email and a password of at least 6 characters. If email confirmation is enabled, click the link in the confirmation email, then return to the site.
