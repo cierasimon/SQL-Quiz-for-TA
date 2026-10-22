@@ -9,12 +9,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB_NAME = os.getenv("POSTGRES_DB", "postgres")
-DB_USER = os.getenv("POSTGRES_USER")
-DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_SSLMODE = os.getenv("DB_SSLMODE", "require")  # Supabase requires "require"
+def env(name, default=None):
+    value = os.getenv(name, default)
+    return value.strip() if value else value
+
+
+DB_NAME = env("POSTGRES_DB", "postgres")
+DB_USER = env("POSTGRES_USER")
+DB_PASSWORD = env("POSTGRES_PASSWORD")
+DB_HOST = env("DB_HOST")
+DB_PORT = env("DB_PORT", "5432")
+DB_SSLMODE = env("DB_SSLMODE", "require")
 
 # Five questions x 4 points = 20 points. Hint SQL uses %s parameters, never f-strings.
 QUESTIONS = [
